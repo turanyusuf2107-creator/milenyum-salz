@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeus Bot | Dijital Asistan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --dark-bg: #050505;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            height: 80vh;
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue), inset 0 0 10px rgba(0, 242, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin: 0;
+        }
+
+        #chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .msg {
+            padding: 12px 18px;
+            border-radius: 15px;
+            max-width: 80%;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .user-msg {
+            align-self: flex-end;
+            background: linear-gradient(45deg, var(--neon-purple), #6a11cb);
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-msg {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            border-bottom-left-radius: 2px;
+        }
+
+        .input-area {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid rgba(0, 242, 255, 0.3);
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            outline: none;
+        }
+
+        button {
+            background: var(--neon-blue);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            box-shadow: 0 0 15px var(--neon-blue);
+            transform: scale(1.05);
+        }
+
+        /* Kaydırma Çubuğu Stili */
+        #chat-box::-webkit-scrollbar { width: 5px; }
+        #chat-box::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>ZEUS AI</h1>
+            <small style="color: var(--neon-purple);">Yusuf Turan Sistemleri</small>
+        </div>
+        
+        <div id="chat-box">
+            <div class="msg bot-msg">Sistem Aktif. Dinliyorum...</div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Mesajınızı yazın..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">GÖNDER</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const message = input.value.trim();
+
+            if (message === "") return;
+
+            // Kullanıcı Mesajı
+            appendMessage(message, 'user-msg');
+            input.value = "";
+
+            // Sunucuya gönder
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                
+                // Bot Mesajı
+                setTimeout(() => {
+                    appendMessage(data.reply, 'bot-msg');
+                }, 500);
+            } catch (error) {
+                appendMessage("Sistem hatası!", 'bot-msg');
+            }
+        }
+
+        function appendMessage(text, className) {
+            const chatBox = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.className = msg ${className};
+            div.textContent = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
